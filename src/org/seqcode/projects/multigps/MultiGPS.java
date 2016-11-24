@@ -211,8 +211,6 @@ public class MultiGPS {
 			
 			manager.close();
 		}
-		System.err.println("Closing");
-		//System.exit(0);
 	}
 	
 	/**
@@ -230,7 +228,7 @@ public class MultiGPS {
 				"\n OPTIONS:\n" +
 				" General:\n"+
 				"\t--out <output file prefix>\n" +
-				"\t--threads <number of threads to use>\n" +
+				"\t--threads <number of threads to use (default=1)>\n" +
 				"\t--verbose [flag to print intermediate files and extra output]\n" +
 				"\t--config <config file: all options here can be specified in a name<space>value text file, over-ridden by command-line args>\n" +
 				" Genome:\n" +
@@ -239,27 +237,33 @@ public class MultiGPS {
 				"\t--expt <file name> AND --format <SAM/BED/IDX>\n" +
 				"\t--ctrl <file name (optional argument. must be same format as expt files)>\n" +
 				"\t--design <experiment design file name to use instead of --expt and --ctrl; see website for format>\n"+
-				"\t--fixedpb <fixed per base limit>\n" +
+				"\t--fixedpb <fixed per base limit (default: estimated from background model)>\n" +
 				"\t--poissongausspb <filter per base using a Poisson threshold parameterized by a local Gaussian sliding window>\n" +
 				"\t--nonunique [flag to use non-unique reads]\n" +
+				"\t--mappability <fraction of the genome that is mappable for these experiments (default=0.8)>\n" +
+				"\t--nocache [flag to turn off caching of the entire set of experiments (i.e. run slower with less memory)]\n" +
 				"Scaling control vs signal counts:\n" +
 				"\t--noscaling [flag to turn off auto estimation of signal vs control scaling factor]\n" +
 				"\t--medianscale [flag to use scaling by median ratio (default = scaling by NCIS)]\n" +
 				"\t--regressionscale [flag to use scaling by regression (default = scaling by NCIS)]\n" +
 				"\t--sesscale [flag to use scaling by SES (default = scaling by NCIS)]\n" +
-				"\t--fixedscaling <multiply control counts by total tag count ratio and then by this factor if not estimating scaling>\n" +
+				"\t--fixedscaling <multiply control counts by total tag count ratio and then by this factor (default: NCIS)>\n" +
 				"\t--scalewin <window size for scaling procedure (default=10000)>\n" +
 				"\t--plotscaling [flag to plot diagnostic information for the chosen scaling method]\n" +
 				" Running MultiGPS:\n" +
 				"\t--d <binding event read distribution file>\n" +
-				"\t--r <max. model update rounds>\n" +
+				"\t--r <max. model update rounds, default=3>\n" +
 				"\t--nomodelupdate [flag to turn off binding model updates]\n" +
-				"\t--minmodelupdateevents <minimum number of events to support an update>\n" +
+				"\t--minmodelupdateevents <minimum number of events to support an update (default=500)>\n" +
 				"\t--nomodelsmoothing [flag to turn off binding model smoothing]\n" +
-				"\t--splinesmoothparam <spline smoothing parameter>\n" +
+				"\t--splinesmoothparam <spline smoothing parameter (default=30)>\n" +
 				"\t--gaussmodelsmoothing [flag to turn on Gaussian model smoothing (default = cubic spline)]\n" +
-				"\t--gausssmoothparam <Gaussian smoothing std dev>\n" +
+				"\t--gausssmoothparam <Gaussian smoothing std dev (default=3)>\n" +
 				"\t--jointinmodel [flag to allow joint events in model updates (default=do not)]\n" +
+				"\t--fixedmodelrange [flag to keep binding model range fixed to inital size (default: vary automatically)]\n" +
+				"\t--prlogconf <Poisson log threshold for potential region scanning(default=-6)>\n" +
+				"\t--alphascale <alpha scaling factor(default=1.0>\n" +
+				"\t--fixedalpha <impose this alpha (default: set automatically)>\n" +
 				"\t--mlconfignotshared [flag to not share component configs in the ML step]\n" +
 				"\t--exclude <file of regions to ignore>\n" +
 				" MultiGPS priors:\n"+
@@ -273,8 +277,8 @@ public class MultiGPS {
 				"\t--mememaxw <maxw arg for MEME (default=18)>\n"+
 				"\t--memeargs <additional args for MEME (default=  -dna -mod zoops -revcomp -nostatus)>\n"+
 				" Reporting binding events:\n" +
-				"\t--q <Q-value minimum (corrected p-value)>\n" +
-				"\t--minfold <minimum event fold-change vs scaled control>\n" +
+				"\t--q <Q-value minimum (default=0.001)>\n" +
+				"\t--minfold <minimum event fold-change vs scaled control (default=1.5)>\n" +
 				"\t--nodifftests [flag to turn off differential enrichment tests]\n" +
 				"\t--rpath <path to the R bin dir (default: R is in $PATH). Note that you need to install edgeR separately>\n" +
 				"\t--edgerod <EdgeR overdispersion parameter (default=0.15)>\n" +
