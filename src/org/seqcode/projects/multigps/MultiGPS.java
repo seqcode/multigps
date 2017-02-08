@@ -234,7 +234,7 @@ public class MultiGPS {
 				" Genome:\n" +
 				"\t--geninfo <genome info file> AND --seq <fasta seq directory reqd if using motif prior>\n" +
 				" Loading Data:\n" +
-				"\t--expt <file name> AND --format <SAM/BED/IDX>\n" +
+				"\t--expt <file name> AND --format <SAM/BED/SCIDX>\n" +
 				"\t--ctrl <file name (optional argument. must be same format as expt files)>\n" +
 				"\t--design <experiment design file name to use instead of --expt and --ctrl; see website for format>\n"+
 				"\t--fixedpb <fixed per base limit (default: estimated from background model)>\n" +
@@ -283,6 +283,7 @@ public class MultiGPS {
 				"\t--rpath <path to the R bin dir (default: R is in $PATH). Note that you need to install edgeR separately>\n" +
 				"\t--edgerod <EdgeR overdispersion parameter (default=0.15)>\n" +
 				"\t--diffp <minimum p-value for reporting differential enrichment (default=0.01)>\n" +
+				"\t--eventsaretxt [add .txt to events file extension]\n" +
 				""));
 	}
 
