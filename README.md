@@ -25,6 +25,8 @@ PLoS Computational Biology (2014) 10(3):e1003501
 Major History:
 --------------
 
+Version 0.73 (2017-02-07): Minor update that includes support for full-genome FASTA files in --seq option. 
+
 Version 0.72 (2016-11-23): First release in this repo. Fixed several bugs for stability.  
 
 Version 0.5 (2014-03-01): Initial release with publication. This version predates the current repo, but code is archived here: http://mahonylab.org/software/multigps
