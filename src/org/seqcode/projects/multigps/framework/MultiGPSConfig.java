@@ -30,7 +30,7 @@ import org.seqcode.gseutils.Args;
  * @version	%I%, %G%
  */
 public class MultiGPSConfig {
-	public static String version = "0.72";
+	public static String version = "0.73";
 	public boolean isGPS=true;
 	protected GenomeConfig gconfig;
 	protected Genome gen=null;
