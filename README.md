@@ -25,7 +25,7 @@ PLoS Computational Biology (2014) 10(3):e1003501
 Major History:
 --------------
 
-Version 0.73 (2017-02-07): Minor update that includes support for full-genome FASTA files in --seq option. 
+Version 0.73 (2017-02-07): Minor update that includes support for full-genome FASTA files in --seq option and other updates to support Galalxy integration.
 
 Version 0.72 (2016-11-23): First release in this repo. Fixed several bugs for stability.  
 
