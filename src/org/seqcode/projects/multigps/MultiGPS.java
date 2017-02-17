@@ -276,6 +276,7 @@ public class MultiGPS {
 				"\t--mememinw <minw arg for MEME (default=6)>\n"+
 				"\t--mememaxw <maxw arg for MEME (default=18)>\n"+
 				"\t--memeargs <additional args for MEME (default=  -dna -mod zoops -revcomp -nostatus)>\n"+
+				"\t--meme1proc [flag to enforce non-parallel version of MEME]\n"+
 				" Reporting binding events:\n" +
 				"\t--q <Q-value minimum (default=0.001)>\n" +
 				"\t--minfold <minimum event fold-change vs scaled control (default=1.5)>\n" +

@@ -63,6 +63,7 @@ public class MultiGPSConfig {
 	protected boolean motif_posprior=true; //You can have motif-finding without using the motif-prior
 	protected String MEMEpath="";
 	protected String MEMEargs=" -dna -mod zoops -revcomp -nostatus ";    //Do not try using -p here; it leads to MEME runtime errors
+	protected boolean MEMEnonparallel=false; //flag to enforce use of non-parallel version
 	public int MEMEminw=6;
 	public int MEMEmaxw=18;
 	protected boolean verbose = false; //Print extra output
@@ -214,6 +215,8 @@ public class MultiGPSConfig {
 				//MEME nmotifs option
 				int MEMEnmotifs = Args.parseInteger(args,"memenmotifs", 3);
 				MEMEargs = MEMEargs + " -nmotifs "+MEMEnmotifs + " -minw "+MEMEminw+" -maxw "+MEMEmaxw;
+				//Enforce non-parallel MEME
+				MEMEnonparallel = Args.parseFlags(args).contains("meme1proc");
 				
 				//Extra output
 				verbose = Args.parseFlags(args).contains("verbose") ? true : false;
@@ -277,6 +280,7 @@ public class MultiGPSConfig {
 	public boolean useMotifPrior(){return motif_posprior;}
 	public String getMEMEpath(){return MEMEpath;}
 	public String getMEMEargs(){return MEMEargs;}
+	public boolean getMEMEnonparallel(){return MEMEnonparallel;}
 	public boolean isVerbose(){return verbose;}
 	
 	/**
@@ -361,6 +365,7 @@ public class MultiGPSConfig {
 				"\t--memenmotifs <number of motifs MEME should find for each condition (default=3)>\n" +
 				"\t--mememinw <minw arg for MEME (default="+MEMEminw+")>\n"+
 				"\t--mememaxw <maxw arg for MEME (default="+MEMEmaxw+")>\n"+
+				"\t--meme1proc [flag to enforce non-parallel version of MEME]\n"+
 				"\t--verbose [flag to print intermediate files and extra output]\n" +
 				"\t--config <config file: all options can be specified in a name<space>value text file, over-ridden by command-line args>\n" +
 				""));
