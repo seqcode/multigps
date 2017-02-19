@@ -294,7 +294,9 @@ public class EventsPostAnalysis {
 							fout.write("\t\t<td>-</td>\n");
 						}else{
 							String filename = config.getOutBase()+"_"+cond.getName()+"_gt_"+othercond.getName()+".diff.events";
-							fout.write("\t\t<td><a href='"+filename+"'>"+bindingManager.countDiffEventsBetweenConditions(cond, othercond, evconfig.getQMinThres(), evconfig.getDiffPMinThres())+"</a></td>\n");
+							if(evconfig.getEventsFileTXTExtension())
+								filename = filename+".txt";
+				    		fout.write("\t\t<td><a href='"+filename+"'>"+bindingManager.countDiffEventsBetweenConditions(cond, othercond, evconfig.getQMinThres(), evconfig.getDiffPMinThres())+"</a></td>\n");
 						}
 					}fout.write("\t\t</tr>\n");
 				}fout.write("\t</table>\n");
