@@ -219,7 +219,7 @@ public class MultiGPS {
 	 */
 	public static String getMultiGPSArgsList(){
 		return(new String("" +
-				"Copyright (C) Shaun Mahony 2012-2016\n" +
+				"Copyright (C) Shaun Mahony 2012-2017\n" +
 				"<http://mahonylab.org/software/multigps>\n" +
 				"\n" +
 				"MultiGPS comes with ABSOLUTELY NO WARRANTY.  This is free software, and you\n"+
@@ -242,6 +242,7 @@ public class MultiGPS {
 				"\t--nonunique [flag to use non-unique reads]\n" +
 				"\t--mappability <fraction of the genome that is mappable for these experiments (default=0.8)>\n" +
 				"\t--nocache [flag to turn off caching of the entire set of experiments (i.e. run slower with less memory)]\n" +
+				"\t--potentialregions <file name of the potential regions file in the format of chr:start-stop>\n" +
 				"Scaling control vs signal counts:\n" +
 				"\t--noscaling [flag to turn off auto estimation of signal vs control scaling factor]\n" +
 				"\t--medianscale [flag to use scaling by median ratio (default = scaling by NCIS)]\n" +

@@ -23,9 +23,9 @@ import org.seqcode.gseutils.Args;
 
 
 /**
- * MultiGPSConfig: 
- * 		Maintains all constants needed by MultiGPS. 
- *     
+ * MultiGPSConfig:
+ * 		Maintains all constants needed by MultiGPS.
+ *
  * @author Shaun Mahony
  * @version	%I%, %G%
  */
@@ -37,10 +37,10 @@ public class MultiGPSConfig {
 	protected String outName="multigps", outBase="multigps";
 	protected File outDir=null, interDir=null, imagesDir=null;
 	protected boolean printHelp=false;
-	protected double sigLogConf=-7; 
-	protected double prLogConf=-6; 
+	protected double sigLogConf=-7;
+	protected double prLogConf=-6;
 	protected int maxModelUpdateRounds=3;
-	protected int maxThreads=1;				//Number of threads to use. Default is 1 for single processor machines. 
+	protected int maxThreads=1;				//Number of threads to use. Default is 1 for single processor machines.
 	protected double alphaScalingFactor = 1.0; //Scale the condition-specific alpha value by this factor
 	protected double fixedAlpha = 0.0; //Fixed alpha value if above 0
 	protected boolean multicondition_posprior=true; //Multiple condition positional prior
@@ -51,7 +51,7 @@ public class MultiGPSConfig {
 	protected boolean smoothingBMDuringUpdate=true;
 	protected boolean gaussianSmoothingBMDuringUpdate=false;
 	protected boolean updateBM=true; //Set to false to turn off binding model update
-	protected boolean includeJointEventsInBMUpdate=false; 
+	protected boolean includeJointEventsInBMUpdate=false;
 	protected double bindingmodel_spline_smooth = 30; //Smoothing step for cubic spline in binding model reestimation
     protected double bindingmodel_gauss_smooth = 2; //Variance for Gaussian smoothing in binding model reestimation
 	protected int addFlankingComponentSpacing=20; //In non-first rounds of EM, the components are initialized using the positions from the last round with additional flanking components added at this spacing
@@ -66,9 +66,10 @@ public class MultiGPSConfig {
 	protected boolean MEMEnonparallel=false; //flag to enforce use of non-parallel version
 	public int MEMEminw=6;
 	public int MEMEmaxw=18;
+	protected String potentialRegions=""; //Where the Potential Regions file is
 	protected boolean verbose = false; //Print extra output
-	 
-    
+
+
 	//Constants
 	public final double LOG2 = Math.log(2);
 	public final int POTREG_BIN_STEP = 100; //Sliding window step in potential region scanner
@@ -81,12 +82,12 @@ public class MultiGPSConfig {
     public final int POSPRIOR_ITER=150;     //Run EM up until <tt>ALPHA_ANNEALING_ITER</tt> with uniform positional prior and then up until at least <tt>POSPRIOR_ANNEALING_ITER</tt> with activated positional prior
     public final int EM_MU_UPDATE_WIN=50; //Half the window size in which to look for mu maximization (i.e. component position) during EM.
     public final double EM_CONVERGENCE = 1e-10; //EM convergence between the likelihood of the current and the previous step
-    public final double EM_STATE_EQUIV_THRES = 1e-10; //EM state equivalence threshold 
+    public final double EM_STATE_EQUIV_THRES = 1e-10; //EM state equivalence threshold
     public final int EM_STATE_EQUIV_ROUNDS = 3; //Number of training rounds where the EM states have to be equivalent
     public final double NOISE_EMISSION_MIN = 0.01; //Arbitrary floor on the emission probability of noise (must be non-zero to mop up noise reads)
     public final double NOISE_EMISSION_MAX = 0.95; //Arbitrary ceiling on the emission probability of noise
     public final int NOISE_DISTRIB_SMOOTHING_WIN = 50; //Smoothing window for the noise distribution used in the BindingMixture
-    public final int MAX_BINDINGMODEL_WIDTH=800; //Maximum width for binding models (affects how large the read profiles are for binding components    
+    public final int MAX_BINDINGMODEL_WIDTH=800; //Maximum width for binding models (affects how large the read profiles are for binding components
     public final int MOTIF_FINDING_SEQWINDOW=80; //Bases to extract around components for motif-finding
     public final int MOTIF_FINDING_TOPSEQS=500; //Number of top components to analyze
     public final double MOTIF_FINDING_ALLOWED_REPETITIVE = 0.2; //Percentage of the examined sequence window allowed to be lowercase or N
@@ -94,7 +95,7 @@ public class MultiGPSConfig {
     public final double MOTIF_MIN_ROC = 0.7; //Motif prior is used only if the ROC is greater than this .
     public final boolean CALC_LL=false; //Calculate the log-likelihood during EM.
 	public final int PCSBUBBLESIZE = 30; //Bubble size for permanganate ChIP-seq
-    
+
 	protected String[] args;
 	public String getArgs(){
 		String a="";
@@ -102,17 +103,17 @@ public class MultiGPSConfig {
 			a = a+" "+args[i];
 		return a;
 	}
-	
+
 	public MultiGPSConfig(GenomeConfig gcon, String[] arguments){this(gcon, arguments, true);}
 	public MultiGPSConfig(GenomeConfig gcon, String[] arguments, boolean isGPS){
 		System.setProperty("java.awt.headless", "true");
 		gconfig = gcon;
 		gen = gconfig.getGenome();
-		this.args=arguments; 
+		this.args=arguments;
 		this.isGPS=isGPS;
 		ArgParser ap = new ArgParser(args);
 		if(args.length==0 || ap.hasKey("h")){
-			printHelp=true;			
+			printHelp=true;
 		}else{
 			try{
 				//Test for a config file... if there is concatenate the contents into the args
@@ -129,7 +130,7 @@ public class MultiGPSConfig {
 			        	String[] words = line.split("\\s+");
 			        	if(!words[0].startsWith("--"))
 			        		words[0] = new String("--"+words[0]);
-			        	confArgs.add(words[0]); 
+			        	confArgs.add(words[0]);
 			        	if(words.length>1){
 				        	String rest=words[1];
 				        	for(int w=2; w<words.length; w++)
@@ -144,20 +145,20 @@ public class MultiGPSConfig {
 			        args = newargs;
 			        ap = new ArgParser(args);
 				}
-				
-				
+
+
 				/****Miscellaneous arguments****/
-				
+
 				//Maximum number of model update rounds
 				maxModelUpdateRounds = Args.parseInteger(args,"r", 3);
 				//Turn off binding model updates
 				updateBM = Args.parseFlags(args).contains("nomodelupdate") ? false : true;
 				//Minimum number of components to support a binding model update
 				minComponentsForBMUpdate = Args.parseInteger(args,"minmodelupdateevents",minComponentsForBMUpdate);
-				//Turn off smoothing during binding model updates 
+				//Turn off smoothing during binding model updates
 				smoothingBMDuringUpdate = Args.parseFlags(args).contains("nomodelsmoothing") ? false : true;
 				//Parameter for spline smoothing
-				bindingmodel_spline_smooth = Args.parseDouble(args,"splinesmoothparam",bindingmodel_spline_smooth); 
+				bindingmodel_spline_smooth = Args.parseDouble(args,"splinesmoothparam",bindingmodel_spline_smooth);
 				//Turn on Gaussian smoothing during binding model updates
 				gaussianSmoothingBMDuringUpdate = Args.parseFlags(args).contains("gaussmodelsmoothing") ? true : false;
 				//Parameter for Gaussian smoothing (std. dev.)
@@ -167,7 +168,7 @@ public class MultiGPSConfig {
 				//Fixed binding model range
 				fixedModelRange = Args.parseFlags(args).contains("fixedmodelrange");
 				//Output path
-				DateFormat df = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");  
+				DateFormat df = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
 			    df.setTimeZone(TimeZone.getTimeZone("EST"));
 				outName = Args.parseString(args, "out", outName+"_"+df.format(new Date()));
 				outDir =  new File(outName); //Output directory
@@ -192,17 +193,17 @@ public class MultiGPSConfig {
 				multicondition_posprior = Args.parseFlags(args).contains("noposprior") ? false : true;
 				//Set a value for the multi-condition positional prior
 				prob_shared_binding = Args.parseDouble(args,"probshared",prob_shared_binding);
-				//Turn off motif-finding 
+				//Turn off motif-finding
 				findMotifs = Args.parseFlags(args).contains("nomotifs") ? false : true;
 				//Turn off motif prior only
-				motif_posprior = (findMotifs && Args.parseFlags(args).contains("nomotifprior")) ? false : true;				
+				motif_posprior = (findMotifs && Args.parseFlags(args).contains("nomotifprior")) ? false : true;
 				//Check whether sequence is available (affects motif-finding behavior)
 				if(isGPS && !gconfig.getSequenceGenerator().usingLocalFiles()){
 					findMotifs=false;
 					motif_posprior=false;
 					System.err.println("No genome sequence data was provided with --seq, so motif-finding and the motif prior are switched off.");
 				}
-				
+
 				//MEME path
 				MEMEpath = Args.parseString(args, "memepath", MEMEpath);
 				if(!MEMEpath.equals("") && !MEMEpath.endsWith("/")){ MEMEpath= MEMEpath+"/";}
@@ -217,13 +218,14 @@ public class MultiGPSConfig {
 				MEMEargs = MEMEargs + " -nmotifs "+MEMEnmotifs + " -minw "+MEMEminw+" -maxw "+MEMEmaxw;
 				//Enforce non-parallel MEME
 				MEMEnonparallel = Args.parseFlags(args).contains("meme1proc");
-				
+				//Potential Regions file path
+				potentialRegions = Args.parseString(args, "potentialregions", potentialRegions);
 				//Extra output
 				verbose = Args.parseFlags(args).contains("verbose") ? true : false;
 				//Shared component config in ML step
 				//MLSharedComponentConfiguration = Args.parseFlags(args).contains("mlsharedconfig") ? true : false;
 				MLSharedComponentConfiguration = Args.parseFlags(args).contains("mlconfignotshared") ? false : true;
-				
+
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -231,9 +233,9 @@ public class MultiGPSConfig {
 			}
 		}
 	}
-	
+
 	/**
-	 * Merge a set of estimated genomes 
+	 * Merge a set of estimated genomes
 	 * @param estGenomes
 	 * @return
 	 */
@@ -248,9 +250,9 @@ public class MultiGPSConfig {
 			}
 		}
 		gen =new Genome("Genome", chrLenMap);
-		return gen;		
+		return gen;
 	}
-	
+
 	//Accessors
 	public Genome getGenome(){return gen;}
 	public boolean helpWanted(){return printHelp;}
@@ -281,8 +283,9 @@ public class MultiGPSConfig {
 	public String getMEMEpath(){return MEMEpath;}
 	public String getMEMEargs(){return MEMEargs;}
 	public boolean getMEMEnonparallel(){return MEMEnonparallel;}
+	public String getPotentialRegions(){return potentialRegions;}
 	public boolean isVerbose(){return verbose;}
-	
+
 	/**
 	 * Make some output directories used by multiGPS
 	 */
@@ -308,7 +311,7 @@ public class MultiGPSConfig {
 	public File getOutputParentDir(){return outDir;}
 	public File getOutputIntermediateDir(){return interDir;}
 	public File getOutputImagesDir(){return imagesDir;}
-	
+
 	/**
 	 * Delete a direcctory
 	 */
@@ -326,9 +329,9 @@ public class MultiGPSConfig {
 	    }
 	    return( path.delete() );
 	}
-	
+
 	/**
-	 * returns a string describing the arguments handled by this parser. 
+	 * returns a string describing the arguments handled by this parser.
 	 * @return String
 	 */
 	public String getArgsList(){
