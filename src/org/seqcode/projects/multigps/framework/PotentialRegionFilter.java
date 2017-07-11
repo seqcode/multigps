@@ -169,7 +169,7 @@ public class PotentialRegionFilter {
 			Region tmp = null;
 			try{
 				for (String item: Files.readAllLines(Paths.get(config.getPotentialRegions()),Charset.forName("UTF-8"))){
-					tmp = parseLine(item);
+					tmp = parseLine(item,config.getPRSize());
 					if (tmp != null) potentialRegions.add(tmp);
 				}
 			}
@@ -193,12 +193,18 @@ public class PotentialRegionFilter {
 	 * Parse the potential regions file
 	 * as used in the execute - branch 2.
 	 */
-	private Region parseLine(String line){
+	private Region parseLine(String line, int size){
 		if (line.trim().equals("")) return null;
 		try{
 			String chromosome = line.trim().split(":")[0].substring(3);
 			int start = Integer.parseInt(line.trim().split(":")[1].split("-")[0]);
 			int end  = Integer.parseInt(line.trim().split("-")[1]);
+			if (size != 0){
+				end = start + end;
+				start = end - size >> 1;
+				start = start < 1?1:start;
+				end = end + size >> 1;
+			}
 			return new Region(gen,chromosome,start,end);
 		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
 			return null;

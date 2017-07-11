@@ -67,6 +67,7 @@ public class MultiGPSConfig {
 	public int MEMEminw=6;
 	public int MEMEmaxw=18;
 	protected String potentialRegions=""; //Where the Potential Regions file is
+	protected int prSize=0; //Potential Regions Size - 0 means no resizing.
 	protected boolean verbose = false; //Print extra output
 
 
@@ -220,6 +221,7 @@ public class MultiGPSConfig {
 				MEMEnonparallel = Args.parseFlags(args).contains("meme1proc");
 				//Potential Regions file path
 				potentialRegions = Args.parseString(args, "potentialregions", potentialRegions);
+				if (potentialRegions != "") prSize = Args.parseInteger(args, "regionsize", prSize);
 				//Extra output
 				verbose = Args.parseFlags(args).contains("verbose") ? true : false;
 				//Shared component config in ML step
@@ -284,6 +286,7 @@ public class MultiGPSConfig {
 	public String getMEMEargs(){return MEMEargs;}
 	public boolean getMEMEnonparallel(){return MEMEnonparallel;}
 	public String getPotentialRegions(){return potentialRegions;}
+	public int getPRSize(){return prSize;}
 	public boolean isVerbose(){return verbose;}
 
 	/**
@@ -343,6 +346,8 @@ public class MultiGPSConfig {
 				"\t--threads <number of threads to use (default="+maxThreads+")>\n" +
 				"Experiment Design File:\n" +
 				"\t--design <file name>\n" +
+				"\t--potentialregions <file name of the potential regions file in the format of chr:start-stop>\n" +
+				"\t--regionsize <new size of potential regions>\n" +
 				"Miscellaneous:\n" +
 				"\t--prlogconf <Poisson log threshold for potential region scanning(default="+prLogConf+")>\n" +
 				"\t--alphascale <alpha scaling factor(default="+alphaScalingFactor+">\n" +
