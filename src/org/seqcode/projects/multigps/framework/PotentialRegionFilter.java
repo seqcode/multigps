@@ -177,6 +177,8 @@ public class PotentialRegionFilter {
 				e.printStackTrace();
 			}
 		}
+		if (! config.getNoMerge())
+			potentialRegions = Region.mergeRegions(potentialRegions);
 		for(Region r : potentialRegions) potRegionLengthTotal+=(double)r.getWidth();
 		countReadsInRegions(potentialRegions);
 		countReadsInRegionsByRep(potentialRegions);

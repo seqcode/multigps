@@ -244,6 +244,7 @@ public class MultiGPS {
 				"\t--nocache [flag to turn off caching of the entire set of experiments (i.e. run slower with less memory)]\n" +
 				"\t--potentialregions <file name of the potential regions file in the format of chr:start-stop>\n" +
 				"\t--regionsize <new size of potential regions>\n" +
+				"\t--nomerge [flag to turn off merging of overlapping regions]\n" +
 				"Scaling control vs signal counts:\n" +
 				"\t--noscaling [flag to turn off auto estimation of signal vs control scaling factor]\n" +
 				"\t--medianscale [flag to use scaling by median ratio (default = scaling by NCIS)]\n" +
