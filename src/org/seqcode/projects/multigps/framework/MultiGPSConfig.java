@@ -69,6 +69,7 @@ public class MultiGPSConfig {
 	protected String potentialRegions=""; //Where the Potential Regions file is
 	protected int prSize=0; //Potential Regions Size - 0 means no resizing.
 	protected boolean noMerge = false; //Don't merge Potential Regions that overlaps
+	protected boolean updateAlpha = true;
 	protected boolean verbose = false; //Print extra output
 
 
@@ -224,6 +225,8 @@ public class MultiGPSConfig {
 				potentialRegions = Args.parseString(args, "potentialregions", potentialRegions);
 				if (potentialRegions != "") prSize = Args.parseInteger(args, "regionsize", prSize);
 				if (potentialRegions != "") noMerge = Args.parseFlags(args).contains("nomerge");
+				//Force Update Alpha
+				if (fixedAlpha>0) updateAlpha = ! Args.parseFlags(args).contains("updatealpha");
 				//Extra output
 				verbose = Args.parseFlags(args).contains("verbose") ? true : false;
 				//Shared component config in ML step
@@ -290,6 +293,7 @@ public class MultiGPSConfig {
 	public String getPotentialRegions(){return potentialRegions;}
 	public int getPRSize(){return prSize;}
 	public boolean getNoMerge(){return noMerge;}
+	public boolean getUpdateAlpha(){return updateAlpha;}
 	public boolean isVerbose(){return verbose;}
 
 	/**
@@ -356,6 +360,7 @@ public class MultiGPSConfig {
 				"\t--prlogconf <Poisson log threshold for potential region scanning(default="+prLogConf+")>\n" +
 				"\t--alphascale <alpha scaling factor(default="+alphaScalingFactor+">\n" +
 				"\t--fixedalpha <impose this alpha (default: set automatically)>\n" +
+				"\t--updatealpha [flag to force updating alpha values even with fixedalpha set]\n" +
 				"\t--nomodelupdate [flag to turn off binding model updates]\n" +
 				"\t--minmodelupdateevents <minimum number of events to support an update(default="+minComponentsForBMUpdate+")>\n" +
 				"\t--nomodelsmoothing [flag to turn off binding model smoothing]\n" +

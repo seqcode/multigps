@@ -267,6 +267,7 @@ public class MultiGPS {
 				"\t--prlogconf <Poisson log threshold for potential region scanning(default=-6)>\n" +
 				"\t--alphascale <alpha scaling factor(default=1.0>\n" +
 				"\t--fixedalpha <impose this alpha (default: set automatically)>\n" +
+				"\t--updatealpha [flag to force updating alpha even when fixedalpha is set]\n" +
 				"\t--mlconfignotshared [flag to not share component configs in the ML step]\n" +
 				"\t--exclude <file of regions to ignore>\n" +
 				" MultiGPS priors:\n"+
