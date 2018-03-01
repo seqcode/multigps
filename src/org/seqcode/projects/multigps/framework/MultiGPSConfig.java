@@ -40,6 +40,7 @@ public class MultiGPSConfig {
 	protected double sigLogConf=-7;
 	protected double prLogConf=-6;
 	protected int maxModelUpdateRounds=3;
+	protected int minModelUpdateRounds=0;
 	protected int maxThreads=1;				//Number of threads to use. Default is 1 for single processor machines.
 	protected double alphaScalingFactor = 1.0; //Scale the condition-specific alpha value by this factor
 	protected double fixedAlpha = 0.0; //Fixed alpha value if above 0
@@ -154,6 +155,7 @@ public class MultiGPSConfig {
 
 				//Maximum number of model update rounds
 				maxModelUpdateRounds = Args.parseInteger(args,"r", 3);
+				minModelUpdateRounds = Args.parseInteger(args,"mr", 0);
 				//Turn off binding model updates
 				updateBM = Args.parseFlags(args).contains("nomodelupdate") ? false : true;
 				//Minimum number of components to support a binding model update
@@ -283,6 +285,7 @@ public class MultiGPSConfig {
 	public boolean getGaussBMSmooth(){return gaussianSmoothingBMDuringUpdate;}
 	public double getBindingModelGaussSmoothParam(){return bindingmodel_gauss_smooth;}
 	public int getMaxModelUpdateRounds(){return maxModelUpdateRounds;}
+	public int getMinModelUpdateRounds(){return minModelUpdateRounds;}
 	public boolean getFixedModelRange(){return fixedModelRange;}
 	public boolean getMLSharedComponentConfiguration(){return MLSharedComponentConfiguration;}
 	public boolean getFindingMotifs(){return findMotifs;}
@@ -348,6 +351,7 @@ public class MultiGPSConfig {
 		return(new String("" +
 				"General:\n" +
 				"\t--r <max. model update rounds (default="+maxModelUpdateRounds+">\n" +
+				"\t--mr <min. model update rounds (default="+minModelUpdateRounds+">\n" +
 				"\t--out <out name (default="+outBase+">\n" +
 				"\t--nonunique [flag to use non-unique reads]\n" +
 				"\t--threads <number of threads to use (default="+maxThreads+")>\n" +

@@ -125,7 +125,9 @@ public class MultiGPS {
             //Check for convergence
             if(round>mgpsconfig.getMaxModelUpdateRounds()){
             	converged=true;
-            }else{
+            } else if (round < mgpsconfig.getMinModelUpdateRounds()){
+		converged=false;
+	    } else {
             	converged = true;
             	for(int l=0; l<kl.length; l++)
             		converged = converged && (kl[l]<-5 || kl[l].isNaN());
@@ -219,7 +221,7 @@ public class MultiGPS {
 	 */
 	public static String getMultiGPSArgsList(){
 		return(new String("" +
-				"Copyright (C) Shaun Mahony 2012-2017\n" +
+				"Copyright (C) Shaun Mahony 2012-2018\n" +
 				"<http://mahonylab.org/software/multigps>\n" +
 				"\n" +
 				"MultiGPS comes with ABSOLUTELY NO WARRANTY.  This is free software, and you\n"+
