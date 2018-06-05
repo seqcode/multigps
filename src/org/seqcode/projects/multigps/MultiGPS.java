@@ -43,7 +43,7 @@ public class MultiGPS {
 	private CountsDataset data;
 	protected Normalization normalizer;
 	protected Map<ControlledExperiment, List<BindingModel>> repBindingModels;
-	
+
 	public MultiGPS(GenomeConfig gcon, ExptConfig econ, EventsConfig evcon, MultiGPSConfig c, ExperimentManager eMan){
 		gconfig = gcon;
 		econfig = econ;
@@ -53,7 +53,7 @@ public class MultiGPS {
 		mgpsconfig.makeGPSOutputDirs(true);
 		outFormatter = new OutputFormatter(mgpsconfig);
 		bindingManager = new BindingManager(evconfig, manager);
-		
+
 		//Initialize binding models & binding model record
 		repBindingModels = new HashMap<ControlledExperiment, List<BindingModel>>();
 		for(ControlledExperiment rep : manager.getReplicates()){
@@ -70,7 +70,7 @@ public class MultiGPS {
 		}
 		for(ExperimentCondition cond : manager.getConditions())
 			bindingManager.updateMaxInfluenceRange(cond);
-		
+
 		//Find potential binding regions
 		System.err.println("Finding potential binding regions.");
 		potentialFilter = new PotentialRegionFilter(evconfig, mgpsconfig, econfig, manager, bindingManager);
@@ -82,27 +82,27 @@ public class MultiGPS {
 		}
 		potentialFilter.printPotentialRegionsToFile();
 	}
-	
+
 	/**
-	 * Run the mixture model to find binding events. 
+	 * Run the mixture model to find binding events.
 	 */
 	public void runMixtureModel() {
 		Double[] kl;
 		System.err.println("Initialzing mixture model");
 		mixtureModel = new BindingMixture(gconfig, econfig, evconfig, mgpsconfig, manager, bindingManager, potentialFilter);
-		
+
 		int round = 0;
 		boolean converged = false;
         while (!converged){
-        	
+
             System.err.println("\n============================ Round "+round+" ============================");
-            
+
             //Execute the mixture model
             if(round==0)
             	mixtureModel.execute(true, true); //EM
             else
             	mixtureModel.execute(true, false); //EM
-            
+
             //Update binding models
             String distribFilename = mgpsconfig.getOutputIntermediateDir()+File.separator+mgpsconfig.getOutBase()+"_t"+round+"_ReadDistrib";
             kl = mixtureModel.updateBindingModel(distribFilename);
@@ -110,29 +110,31 @@ public class MultiGPS {
             for(ControlledExperiment rep : manager.getReplicates())
     			repBindingModels.get(rep).add(bindingManager.getBindingModel(rep));
             mixtureModel.updateAlphas();
-            
+
             //Update motifs
             mixtureModel.updateMotifs();
-            
+
             //Update noise models
             mixtureModel.updateGlobalNoise();
-            
+
             //Print current components
             mixtureModel.printActiveComponentsToFile();
-            
+
             round++;
-            
+
             //Check for convergence
             if(round>mgpsconfig.getMaxModelUpdateRounds()){
             	converged=true;
-            }else{
+            } else if (round < mgpsconfig.getMinModelUpdateRounds()){
+		converged=false;
+	    } else {
             	converged = true;
             	for(int l=0; l<kl.length; l++)
             		converged = converged && (kl[l]<-5 || kl[l].isNaN());
             }
         }
         outFormatter.plotAllReadDistributions(repBindingModels);
-        
+
         //ML quantification of events
         System.err.println("\n============================ ML read assignment ============================");
         mixtureModel.execute(false, false); //ML
@@ -140,21 +142,21 @@ public class MultiGPS {
         //Update sig & noise counts in each replicate
         bindingManager.estimateSignalVsNoiseFractions(bindingManager.getBindingEvents());
         System.err.println("ML read assignment finished.");
-        
+
         System.err.println("\n============================= Post-processing ==============================");
-        
-        //Statistical analysis: Enrichment over controls 
+
+        //Statistical analysis: Enrichment over controls
         EnrichmentSignificance tester = new EnrichmentSignificance(evconfig, manager, bindingManager, evconfig.getMinEventFoldChange(), econfig.getMappableGenomeLength());
 		tester.execute();
-        
+
 		//Write the replicate counts to a file (needed before EdgeR differential enrichment)
 		bindingManager.writeReplicateCounts(mgpsconfig.getOutputParentDir()+File.separator+mgpsconfig.getOutBase()+".replicates.counts");
-		
+
 		//Statistical analysis: inter-condition differences
 		if(manager.getNumConditions()>1 && evconfig.getRunDiffTests()){
 			normalizer = new TMMNormalization(manager.getReplicates().size(), 0.3, 0.05);
 			DifferentialEnrichment edgeR = new EdgeRDifferentialEnrichment(evconfig, mgpsconfig.getOutputParentDir(), mgpsconfig.getOutBase());
-			
+
 			for(int ref=0; ref<manager.getNumConditions(); ref++){
 				data = new CountsDataset(manager, bindingManager.getBindingEvents(), ref);
 				//normalizer.normalize(data);
@@ -162,28 +164,28 @@ public class MultiGPS {
 				edgeR.setFileIDname("_"+manager.getIndexedCondition(ref).getName());
 				data = edgeR.execute(data);
 				data.updateEvents(bindingManager.getBindingEvents(), manager);
-				
+
 				//Print MA scatters (inter-sample & inter-condition)
 				//data.savePairwiseFocalSampleMAPlots(config.getOutputImagesDir()+File.separator, true);
 				data.savePairwiseConditionMAPlots(evconfig.getDiffPMinThres(), mgpsconfig.getOutputImagesDir()+File.separator, true);
-				
+
 				//Print XY scatters (inter-sample & inter-condition)
 				data.savePairwiseFocalSampleXYPlots(mgpsconfig.getOutputImagesDir()+File.separator, true);
 				data.savePairwiseConditionXYPlots(manager, bindingManager, evconfig.getDiffPMinThres(), mgpsconfig.getOutputImagesDir()+File.separator, true);
 			}
 		}
-        
+
         // Print final events to files
 		bindingManager.writeBindingEventFiles(mgpsconfig.getOutputParentDir()+File.separator+mgpsconfig.getOutBase(), evconfig.getQMinThres(), evconfig.getRunDiffTests(), evconfig.getDiffPMinThres());
 		if(mgpsconfig.getFindingMotifs())
 			bindingManager.writeMotifFile(mgpsconfig.getOutputParentDir()+File.separator+mgpsconfig.getOutBase()+".motifs");
         System.err.println("Binding event detection finished!\nBinding events are printed to files in "+mgpsconfig.getOutputParentDir()+" beginning with: "+mgpsconfig.getOutName());
-        
+
         //Post-analysis of peaks
         EventsPostAnalysis postAnalyzer = new EventsPostAnalysis(evconfig, mgpsconfig, manager, bindingManager, bindingManager.getBindingEvents(), mixtureModel.getMotifFinder());
         postAnalyzer.execute(400);
     }
-	
+
 	/**
 	 * Main driver method for MultiGPS
 	 * @param args
@@ -198,28 +200,28 @@ public class MultiGPS {
 		if(config.helpWanted()){
 			System.err.println(MultiGPS.getMultiGPSArgsList());
 		}else{
-			
+
 			ExperimentManager manager = new ExperimentManager(econ);
-			
+
 			//Just a test to see if we've loaded all conditions
 			if(manager.getConditions().size()==0){
 				System.err.println("No experiments specified. Use --expt or --design options."); System.exit(1);
 			}
-			
+
 			MultiGPS gps = new MultiGPS(gcon, econ, evconfig, config, manager);
 			gps.runMixtureModel();
-			
+
 			manager.close();
 		}
 	}
-	
+
 	/**
-	 * returns a string describing the arguments for the public version of MultiGPS. 
+	 * returns a string describing the arguments for the public version of MultiGPS.
 	 * @return String
 	 */
 	public static String getMultiGPSArgsList(){
 		return(new String("" +
-				"Copyright (C) Shaun Mahony 2012-2016\n" +
+				"Copyright (C) Shaun Mahony 2012-2018\n" +
 				"<http://mahonylab.org/software/multigps>\n" +
 				"\n" +
 				"MultiGPS comes with ABSOLUTELY NO WARRANTY.  This is free software, and you\n"+
@@ -242,6 +244,9 @@ public class MultiGPS {
 				"\t--nonunique [flag to use non-unique reads]\n" +
 				"\t--mappability <fraction of the genome that is mappable for these experiments (default=0.8)>\n" +
 				"\t--nocache [flag to turn off caching of the entire set of experiments (i.e. run slower with less memory)]\n" +
+				"\t--potentialregions <file name of the potential regions file in the format of chr:start-stop>\n" +
+				"\t--regionsize <new size of potential regions>\n" +
+				"\t--nomerge [flag to turn off merging of overlapping regions]\n" +
 				"Scaling control vs signal counts:\n" +
 				"\t--noscaling [flag to turn off auto estimation of signal vs control scaling factor]\n" +
 				"\t--medianscale [flag to use scaling by median ratio (default = scaling by NCIS)]\n" +
@@ -264,6 +269,7 @@ public class MultiGPS {
 				"\t--prlogconf <Poisson log threshold for potential region scanning(default=-6)>\n" +
 				"\t--alphascale <alpha scaling factor(default=1.0>\n" +
 				"\t--fixedalpha <impose this alpha (default: set automatically)>\n" +
+				"\t--updatealpha [flag to force updating alpha even when fixedalpha is set]\n" +
 				"\t--mlconfignotshared [flag to not share component configs in the ML step]\n" +
 				"\t--exclude <file of regions to ignore>\n" +
 				" MultiGPS priors:\n"+
