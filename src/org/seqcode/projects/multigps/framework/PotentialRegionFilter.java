@@ -120,19 +120,25 @@ public class PotentialRegionFilter {
 	 */
 	public List<Region> execute(){
 		//TODO: check config for defined subset of regions
-		Iterator<Region> testRegions = new ChromosomeGenerator().execute(config.getGenome());
+		Iterator<Region> testRegionsIter = new ChromosomeGenerator().execute(config.getGenome());
+		List<Region> testRegions = new ArrayList<Region>();
+		while(testRegionsIter.hasNext())
+			testRegions.add(testRegionsIter.next());
+		
+		//If we put the exclude filter here, we can deal with large regions that overlap exclude regions more smoothly
+		//However, this method of filtering is safest when excluding regions from whole chromosomes or other large regions
+		testRegions = filterExcludedLeaveRemaining(testRegions);
 		
 		//Threading divides analysis over entire chromosomes. This approach is not compatible with file caching. 
 		int numThreads = econfig.getCacheAllData() ? config.getMaxThreads() : 1;
 				
 		Thread[] threads = new Thread[numThreads];
-        ArrayList<Region> threadRegions[] = new ArrayList[numThreads];
+        List<Region> threadRegions[] = new ArrayList[numThreads];
         int i = 0;
         for (i = 0 ; i < threads.length; i++) {
             threadRegions[i] = new ArrayList<Region>();
         }i=0;
-        while(testRegions.hasNext()){
-        	Region r = testRegions.next(); 
+        for(Region r : testRegions){ 
             threadRegions[(i++) % numThreads].add(r);
         }
 
@@ -167,6 +173,36 @@ public class PotentialRegionFilter {
         	potRegionLengthTotal+=(double)r.getWidth();
         
      	return potentialRegions;
+	}
+	
+    
+    /**
+     * Filter out pre-defined regions to ignore (e.g. blacklist regions)
+     * This version returns segments of regions that don't overlap. 
+     * Safest to apply to whole chromosomes, I think
+     */
+    protected List<Region> filterExcludedLeaveRemaining(List<Region> testRegions) {
+		if(config.getRegionsToIgnore().size()==0)
+			return testRegions;
+		
+		List<Region> filtered = new ArrayList<Region>();
+		filtered.addAll(testRegions);
+		for(Region i : config.getRegionsToIgnore()){
+			boolean overlaps = false;
+			int x=0;
+			while(x < filtered.size() && overlaps==false){
+				Region t = filtered.get(x);
+				if(t.overlaps(i)){
+					overlaps = true;
+					Collection<Region> subFrags = t.getSubtractionFragments(i);
+					filtered.remove(x);
+					if(subFrags.size()>0)
+						filtered.addAll(subFrags);
+				}
+				x++;
+			}
+		}
+		return filtered;
 	}
 	
 	/**
